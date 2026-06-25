@@ -11,6 +11,8 @@
     "skills/",
     "README.md",
     "SKILL.md",
+    "CHANGELOG.md",
+    "LICENSE",
     ".gitignore"
   ],
   "engines": {

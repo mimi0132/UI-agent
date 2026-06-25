@@ -1,15 +1,61 @@
 # Vue UI Agent
 
+<div align="center">
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
+[![GitHub stars](https://img.shields.io/github/stars/mimi0132/vue-ui-agent.svg)](https://github.com/mimi0132/vue-ui-agent)
+
+**从 UI 截图一键生成完整前端组件库**
+
+[English](README.en.md) | 简体中文
+
+</div>
+
 从 UI 截图一键生成完整前端组件库。支持 Vue 3 / React 双框架，兼容所有 AI 编程工具（Cursor、Claude Code、Codex、GitHub Copilot 等）。
 
-## 特性
+## ✨ 特性
 
 - **整张截图 → 整套组件库**：自动推导 Design Token，生成 Button、Input、Card、Badge、Avatar、Tooltip 等高复用组件
 - **双框架输出**：Vue 3 (`<script setup lang="ts">`) / React (Function Component + TypeScript)
 - **多 AI 自动适配**：只需配置一个环境变量，自动使用 Gemini / GPT / Claude / DeepSeek / 通义千问
 - **通用兼容**：不绑定特定 Agent，任何具备文件读写能力的 AI 工具都能用
 - **零业务耦合**：纯视觉还原，不引入任何第三方 UI 库
-- **浏览器预览**：生成后自动打开预览页面
+- **浏览器预览**：生成后自动打开预览页面（颜色库 + 所有组件独立卡片）
+
+## 🎨 效果预览
+
+预览页布局示意：
+
+```
+┌──────────────────────────────────────────┐
+│  Vue UI Agent · 组件预览                    │
+│  共 10 个组件 · Vue 3                      │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│  🎨 颜色库 · 30+ 颜色变量                  │
+│  中性色 Gray │ 主色 Primary │ 语义色 Success │
+│  [50][100][200][300] ... [900]             │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│  Button · Button.vue · 组件预览           │
+│  [主要] [次要] [幽灵] [危险] [禁用]        │
+│  ▶ 查看源码                                │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│  Input · Input.vue · 组件预览              │
+│  [default] [error] [success] [disabled]    │
+│  ▶ 查看源码                                │
+└──────────────────────────────────────────┘
+
+... Card / Badge / Avatar / Divider / ...
+```
+
+实际效果截图：[GitHub Assets](https://github.com/mimi0132/vue-ui-agent/tree/main/.github/assets) （待添加）
 
 ## 安装
 
