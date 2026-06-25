@@ -32,13 +32,19 @@ export OPENAI_API_KEY="sk-..."
 # 或
 export ANTHROPIC_API_KEY="sk-ant-..."
 
-# 2. 执行命令
+# 2a. 从本地图片生成
 vue-ui-agent ./screenshot.png --framework vue --output ./src/components/generated
 
+# 2b. 从网页 URL 生成（自动打开浏览器截图）
+vue-ui-agent https://dribbble.com/shots/xxx --url --framework vue
+
 # 完整参数
-vue-ui-agent <图片路径> \
+vue-ui-agent <图片路径|URL> \
   --framework vue    # vue 或 react，默认 vue
   --output ./src/components/generated  # 输出目录
+  --url              # 指定输入为 URL（自动浏览器截图）
+  --viewport 1920x1080  # 截图视口尺寸
+  --full-page        # 截图整个页面（默认开启）
 ```
 
 ## 使用方式二：作为 MCP 工具（推荐，Trae / Cursor / Claude Desktop）
@@ -87,9 +93,15 @@ npm root -g
 
 在 Trae 聊天框中：
 
+**方式 A：拖图生成**
 1. 拖入一张 UI 截图
 2. 说："帮我生成这套 UI 的组件，用 Vue 3"
-3. AI 自动调用工具，生成文件，输出结果如下：
+
+**方式 B：输入 URL 生成**
+1. 直接说："帮我打开 https://dribbble.com/shots/xxx 这个网页，截图后生成 Vue 3 组件"
+2. AI 自动调用工具，先浏览器截图，再分析生成组件
+
+输出结果如下：
 
 ```
 ✅ Vue 3 组件库已成功生成！
@@ -190,12 +202,20 @@ echo $GEMINI_API_KEY
 echo $ANTHROPIC_API_KEY
 ```
 
-### 2. 生成的文件为空或解析失败
+### 2. 浏览器截图失败（Playwright）
+
+首次使用 URL 截图功能时，需要安装 Playwright 浏览器：
+
+```bash
+npx playwright install chromium
+```
+
+### 3. 生成的文件为空或解析失败
 
 - 检查 API Key 是否有效（余额是否充足）
 - 部分免费模型（如 Ollama 本地小模型）可能无法处理多文件输出，建议换用 gpt-4o 或 gemini-2.5-flash
 
-### 3. 如何切换 AI 模型？
+### 4. 如何切换 AI 模型？
 
 修改对应的环境变量即可，无需修改代码。优先级：`OPENAI` > `ANTHROPIC` > `GEMINI`。
 

@@ -9,18 +9,37 @@ const server = new McpServer({ name: 'vue-ui-agent', version: '1.0.0' });
 
 server.tool(
   'generate_component',
-  '根据 UI 截图自动生成一整套高复用的前端组件库代码（Vue 3 或 React），包含 Button、Input、Card、Badge、Avatar 等多个组件，每个写入独立文件。自动使用当前环境中已配置的 AI 服务。',
+  '根据 UI 截图或网页 URL 自动生成一整套高复用的前端组件库代码（Vue 3 或 React）。支持直接传入截图 Base64，或传入 URL 自动打开浏览器截图后分析。',
   {
-    image_base64: z.string().describe('UI 截图的 Base64 编码字符串'),
+    image_base64: z.string().optional().describe('UI 截图的 Base64 编码字符串（与 url 二选一）'),
+    url: z.string().optional().describe('网页 URL，工具会自动打开浏览器截图后分析（与 image_base64 二选一）'),
     image_mime_type: z.string().optional().default('image/png').describe('图片 MIME 类型'),
     framework: z.enum(['vue', 'react']).describe('目标框架：vue 或 react'),
     output_dir: z.string().optional().default('./src/components/generated').describe('输出目录路径'),
   },
-  async ({ image_base64, image_mime_type, framework, output_dir }) => {
+  async ({ image_base64, url, image_mime_type, framework, output_dir }) => {
     try {
+      let finalImageBase64 = image_base64;
+      let finalMimeType = image_mime_type;
+
+      // 如果传了 URL，先截图
+      if (url && !image_base64) {
+        const { captureScreenshot } = await import('./core.js');
+        const result = await captureScreenshot(url);
+        finalImageBase64 = result.base64;
+        finalMimeType = result.mimeType;
+      }
+
+      if (!finalImageBase64) {
+        return {
+          content: [{ type: 'text', text: '❌ 请提供 image_base64 或 url 之一' }],
+          isError: true,
+        };
+      }
+
       const result = await generateComponentLibrary({
-        imageBase64: image_base64,
-        imageMimeType: image_mime_type,
+        imageBase64: finalImageBase64,
+        imageMimeType: finalMimeType,
         framework,
         outputDir: output_dir,
       });

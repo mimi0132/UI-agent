@@ -1,5 +1,40 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { chromium } from 'playwright';
+
+/**
+ * 用浏览器打开 URL 并截图，返回 Base64 编码
+ */
+export async function captureScreenshot(url, options = {}) {
+  const { width = 1440, height = 900, fullPage = true, waitFor = 3000 } = options;
+
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width, height } });
+
+  try {
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+
+    // 等待页面稳定（动画、字体加载等）
+    if (waitFor > 0) await page.waitForTimeout(waitFor);
+
+    const screenshotBuffer = await page.screenshot({
+      type: 'png',
+      fullPage,
+    });
+
+    await browser.close();
+
+    return {
+      base64: screenshotBuffer.toString('base64'),
+      mimeType: 'image/png',
+      width,
+      height,
+    };
+  } catch (error) {
+    await browser.close();
+    throw new Error(`浏览器截图失败: ${error.message}`);
+  }
+}
 
 /**
  * 检测当前环境可用的 AI Provider
