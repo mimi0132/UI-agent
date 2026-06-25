@@ -104,7 +104,7 @@ ${fileList}
 
     if (preview) {
       console.log('🌐 正在启动预览服务...');
-      const previewUrl = await createPreview(result.outputDir, framework, result.writtenFiles);
+      const previewUrl = await createPreview(result.outputDir, framework, result.writtenFiles, result.rawText);
       console.log(`👀 预览已打开: ${previewUrl}`);
     }
   } catch (error) {

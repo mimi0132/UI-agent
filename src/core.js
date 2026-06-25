@@ -469,5 +469,6 @@ export async function generateComponentLibrary({
     outputDir: resolvedOutputDir,
     elapsed,
     fileExt,
+    rawText,
   };
 }
