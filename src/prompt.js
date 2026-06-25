@@ -187,9 +187,57 @@ export default Button;
 
 ### 输出格式要求（极其重要！）
 
-你必须按以下严格格式输出**多个组件**，用特殊分隔符区分每个组件文件：
+你必须按以下严格格式输出**多个组件**，用特殊分隔符区分每个组件文件。**第一个文件必须是 theme.css**，包含完整的设计 Token：
 
 \`\`\`
+<!-- FILE_START: theme.css -->
+:root {
+  /* 颜色系统 */
+  --ui-color-primary: #从截图提取的主色;
+  --ui-color-primary-hover: #主色hover值;
+  --ui-color-secondary: #次要颜色;
+  --ui-color-success: #成功色;
+  --ui-color-warning: #警告色;
+  --ui-color-danger: #危险色;
+  --ui-color-bg: #背景色;
+  --ui-color-surface: #表面色;
+  --ui-color-border: #边框色;
+  --ui-color-text-primary: #主文字色;
+  --ui-color-text-secondary: #次要文字色;
+  
+  /* 圆角系统 */
+  --ui-radius-sm: 4px;
+  --ui-radius-md: 8px;
+  --ui-radius-lg: 12px;
+  --ui-radius-xl: 16px;
+  --ui-radius-full: 9999px;
+  
+  /* 阴影系统 */
+  --ui-shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --ui-shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --ui-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --ui-shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  
+  /* 间距系统 */
+  --ui-space-xs: 4px;
+  --ui-space-sm: 8px;
+  --ui-space-md: 16px;
+  --ui-space-lg: 24px;
+  --ui-space-xl: 32px;
+  
+  /* 字体系统 */
+  --ui-font-size-xs: 12px;
+  --ui-font-size-sm: 14px;
+  --ui-font-size-md: 16px;
+  --ui-font-size-lg: 18px;
+  --ui-font-size-xl: 24px;
+  
+  /* 过渡动画 */
+  --ui-transition-fast: 150ms ease;
+  --ui-transition-normal: 200ms ease;
+}
+<!-- FILE_END: theme.css -->
+
 <!-- FILE_START: Button.vue -->
 <完整的 Button 组件代码>
 <!-- FILE_END: Button.vue -->
@@ -208,11 +256,13 @@ export default Button;
 \`\`\`
 
 **格式规则**：
-1. 每个组件用 \`<!-- FILE_START: 文件名 -->\` 和 \`<!-- FILE_END: 文件名 -->\` 包裹
-2. 文件名使用 PascalCase：\`Button.vue\`, \`Input.vue\`, \`Card.vue\` 等（React 用 \`.tsx\` 后缀）
-3. 组件之间不要有其他文字解释
-4. 至少生成 **6 个以上** 组件（Button + Input + Card + Badge + Avatar + Divider 为基础必选）
-5. 根据截图内容**智能延伸**相关组件（看到表单就加 Select/Switch/Checkbox，看到数据列表就加 Table/Pagination）
+1. **第一个文件必须是 theme.css**，包含所有从截图提取的 Design Token（颜色、圆角、阴影、间距、字体）
+2. 每个组件用 \`<!-- FILE_START: 文件名 -->\` 和 \`<!-- FILE_END: 文件名 -->\` 包裹
+3. 文件名使用 PascalCase：\`Button.vue\`, \`Input.vue\`, \`Card.vue\` 等（React 用 \`.tsx\` 后缀）
+4. 组件之间不要有其他文字解释
+5. 至少生成 **6 个以上** 组件（Button + Input + Card + Badge + Avatar + Divider 为基础必选）
+6. 根据截图内容**智能延伸**相关组件（看到表单就加 Select/Switch/Checkbox，看到数据列表就加 Table/Pagination）
+7. 组件代码中**必须引用 theme.css 中定义的 CSS 变量**，不要硬编码颜色值
 
 ## 设计原则
 

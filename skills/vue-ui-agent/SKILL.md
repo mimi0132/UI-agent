@@ -55,11 +55,20 @@
 
 每个组件必须写入独立文件，文件路径：`src/components/ui/{组件名}.vue` 或 `.tsx`。
 
-输出内容必须用标记分隔，便于解析：
+输出内容必须用标记分隔，便于解析。**第一个文件必须是 theme.css**：
 
 ```
+<!-- FILE_START: theme.css -->
+:root {
+  --ui-color-primary: #从截图提取的主色;
+  --ui-radius-md: 8px;
+  --ui-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  /* ... 所有 Design Token */
+}
+<!-- FILE_END: theme.css -->
+
 <!-- FILE_START: Button.vue -->
-...组件代码...
+...组件代码（引用 theme.css 中的 CSS 变量）...
 <!-- FILE_END: Button.vue -->
 
 <!-- FILE_START: Input.vue -->
@@ -68,6 +77,17 @@
 ```
 
 **禁止**：用 ```vue ``` 等 markdown 代码块包裹。
+
+**输出文件清单**：
+- `theme.css` — Design Token（颜色、圆角、阴影、间距、字体）
+- `Button.vue` / `Button.tsx` — 按钮组件
+- `Input.vue` / `Input.tsx` — 输入框组件
+- `Card.vue` / `Card.tsx` — 卡片组件
+- `Badge.vue` / `Badge.tsx` — 徽章组件
+- `Avatar.vue` / `Avatar.tsx` — 头像组件
+- `Divider.vue` / `Divider.tsx` — 分割线组件
+- `Tooltip.vue` / `Tooltip.tsx` — 提示气泡组件
+- `index.ts` — 组件统一导出（自动生成）
 
 ### Step 4：浏览器预览
 

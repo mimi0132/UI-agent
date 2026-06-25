@@ -44,7 +44,7 @@ export function parseComponentFiles(rawText, defaultExt) {
 
   if (files.length === 0) {
     const cleanCode = rawText
-      .replace(/^```(?:vue|tsx|html|typescript|ts|javascript|js)?\s*\n?/i, '')
+      .replace(/^```(?:vue|tsx|html|typescript|ts|javascript|js|css)?\s*\n?/i, '')
       .replace(/\n?```\s*$/i, '')
       .trim();
     if (cleanCode) {
@@ -59,13 +59,77 @@ export function parseComponentFiles(rawText, defaultExt) {
 }
 
 /**
+ * 生成组件统一导出文件
+ */
+function generateIndexFile(componentFiles, framework) {
+  const isVue = framework === 'vue';
+  const exports = componentFiles
+    .filter(f => f.fileName.endsWith(isVue ? '.vue' : '.tsx'))
+    .map(f => {
+      const compName = f.fileName.replace(isVue ? '.vue' : '.tsx', '');
+      return `export { default as ${compName} } from './${f.fileName}';`;
+    })
+    .join('\n');
+
+  return `${exports}\n`;
+}
+
+/**
+ * 生成主题 CSS 文件（从组件中提取 Design Token）
+ */
+function generateThemeCSS(componentFiles) {
+  const tokens = new Set();
+  
+  componentFiles.forEach(f => {
+    const cssVarMatches = f.content.match(/--ui-\w+:\s*[^;]+;/g);
+    if (cssVarMatches) {
+      cssVarMatches.forEach(match => tokens.add(match));
+    }
+  });
+
+  if (tokens.size === 0) {
+    return `:root {
+  --ui-color-primary: #6366F1;
+  --ui-color-primary-hover: #4F46E5;
+  --ui-color-secondary: #64748B;
+  --ui-color-success: #10B981;
+  --ui-color-warning: #F59E0B;
+  --ui-color-danger: #EF4444;
+  --ui-color-info: #3B82F6;
+  --ui-color-bg: #FFFFFF;
+  --ui-color-surface: #FAFAFA;
+  --ui-color-border: #E5E7EB;
+  --ui-color-text-primary: #111827;
+  --ui-color-text-secondary: #6B7280;
+  --ui-color-text-muted: #9CA3AF;
+  --ui-radius-sm: 4px;
+  --ui-radius-md: 8px;
+  --ui-radius-lg: 12px;
+  --ui-radius-xl: 16px;
+  --ui-radius-full: 9999px;
+  --ui-shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --ui-shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --ui-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --ui-shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --ui-shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+  --ui-transition-fast: 150ms ease;
+  --ui-transition-normal: 200ms ease;
+  --ui-transition-slow: 300ms ease;
+}
+`;
+  }
+
+  return `:root {\n${Array.from(tokens).join('\n')}\n}\n`;
+}
+
+/**
  * 核心生成逻辑：调用 AI → 解析文件 → 写入磁盘
  */
 export async function generateComponentLibrary({
   imageBase64,
   imageMimeType = 'image/png',
   framework,
-  outputDir = './src/components/generated',
+  outputDir = './src/components/ui',
   onProgress,
 }) {
   const startTime = Date.now();
@@ -107,6 +171,16 @@ export async function generateComponentLibrary({
     fs.writeFileSync(outputPath, file.content, 'utf-8');
     writtenFiles.push(file.fileName);
   }
+
+  const indexContent = generateIndexFile(componentFiles, framework);
+  const indexPath = path.join(resolvedOutputDir, 'index.ts');
+  fs.writeFileSync(indexPath, indexContent, 'utf-8');
+  writtenFiles.push('index.ts');
+
+  const themeContent = generateThemeCSS(componentFiles);
+  const themePath = path.join(resolvedOutputDir, 'theme.css');
+  fs.writeFileSync(themePath, themeContent, 'utf-8');
+  writtenFiles.push('theme.css');
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 

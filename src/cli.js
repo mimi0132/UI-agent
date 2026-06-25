@@ -14,7 +14,7 @@ Vue UI Agent — 从截图生成整套 UI 组件库
 
 选项:
   --framework, -f    目标框架: vue | react   (默认: vue)
-  --output, -o       输出目录               (默认: ./src/components/generated)
+  --output, -o       输出目录               (默认: ./src/components/ui)
   --no-preview       生成后不自动打开浏览器预览
   --help, -h         显示帮助
 
@@ -39,7 +39,7 @@ async function main() {
   }
 
   let framework = 'vue';
-  let outputDir = './src/components/generated';
+  let outputDir = './src/components/ui';
   let openPreview = true;
 
   for (let i = 1; i < args.length; i++) {
