@@ -29,29 +29,47 @@ export async function detectProvider() {
 
 /**
  * 从 AI 返回文本中解析多个组件文件
+ *
+ * 规则：
+ * 1. 主要通过 <!-- FILE_START: 文件名 --> 包裹提取
+ * 2. 兜底从 markdown code block 中提取
+ * 3. 自动补全文件后缀
  */
 export function parseComponentFiles(rawText, defaultExt) {
   const filePattern = /<!--\s*FILE_START:\s*(.+?)\s*-->([\s\S]*?)<!--\s*FILE_END:\s*\1\s*-->/g;
   const files = [];
+  const seen = new Set();
   let match;
 
   while ((match = filePattern.exec(rawText)) !== null) {
     let fileName = match[1].trim();
     const content = match[2].trim();
+    if (!fileName) continue;
     if (!path.extname(fileName)) fileName = fileName + defaultExt;
-    if (content && content.length > 50) files.push({ fileName, content });
+    // 重复同名文件去重，保留最后一个
+    if (seen.has(fileName)) {
+      const idx = files.findIndex(f => f.fileName === fileName);
+      if (idx >= 0) files[idx] = { fileName, content };
+    } else {
+      seen.add(fileName);
+      files.push({ fileName, content });
+    }
   }
 
   if (files.length === 0) {
-    const cleanCode = rawText
-      .replace(/^```(?:vue|tsx|html|typescript|ts|javascript|js|css)?\s*\n?/i, '')
-      .replace(/\n?```\s*$/i, '')
-      .trim();
-    if (cleanCode) {
-      files.push({
-        fileName: `GeneratedComponent_${Date.now()}${defaultExt}`,
-        content: cleanCode,
-      });
+    // 兜底：从 markdown code block 中提取
+    const codeBlockPattern = /```(?:vue|tsx|html|typescript|ts|javascript|js|css)?\s*\n([\s\S]*?)\n```/g;
+    let blockMatch;
+    while ((blockMatch = codeBlockPattern.exec(rawText)) !== null) {
+      const content = blockMatch[1].trim();
+      if (content) {
+        files.push({
+          fileName: `GeneratedComponent_${Date.now()}${defaultExt}`,
+          content,
+        });
+        // 只取第一个
+        break;
+      }
     }
   }
 
@@ -441,9 +459,10 @@ export async function generateComponentLibrary({
   }
 
   const indexContent = generateIndexFile(componentFiles, framework);
-  const indexPath = path.join(resolvedOutputDir, 'index.ts');
+  const indexExt = framework === 'react' ? 'index.ts' : 'index.ts'; // 统一用 .ts（Vue/React 都支持）
+  const indexPath = path.join(resolvedOutputDir, indexExt);
   fs.writeFileSync(indexPath, indexContent, 'utf-8');
-  writtenFiles.push('index.ts');
+  writtenFiles.push(indexExt);
 
   if (!hasThemeCSS) {
     const themeContent = generateThemeCSS(componentFiles);

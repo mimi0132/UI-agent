@@ -552,6 +552,13 @@ export async function createPreview(outputDir, framework, fileNames, rawText) {
     server.listen(port, '127.0.0.1', async () => {
       const url = `http://127.0.0.1:${port}`;
 
+      // 注册退出时关闭服务
+      const cleanup = () => {
+        try { server.close(); } catch { /* noop */ }
+      };
+      process.once('SIGINT', cleanup);
+      process.once('SIGTERM', cleanup);
+
       try {
         if (process.platform === 'darwin') {
           await execAsync(`open "${url}"`);

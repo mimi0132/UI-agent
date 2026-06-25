@@ -6,11 +6,22 @@
   "bin": {
     "vue-ui-agent": "./src/cli.js"
   },
+  "files": [
+    "src/",
+    "skills/",
+    "README.md",
+    "SKILL.md",
+    ".gitignore"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node src/cli.js",
     "preview": "node src/preview.js",
     "lint": "node src/lint.js",
-    "check": "npm run lint && node -e \"import('./src/core.js');import('./src/cli.js');import('./src/preview.js');console.log('✅ 所有模块检查通过')\""
+    "check": "npm run lint && node -e \"import('./src/core.js');import('./src/cli.js');import('./src/preview.js');console.log('✅ 所有模块检查通过')\"",
+    "test:install": "node -e \"console.log('测试安装入口')\" && node src/cli.js --help"
   },
   "keywords": [
     "vue",
@@ -22,10 +33,21 @@
     "claude-code",
     "gemini",
     "openai",
-    "claude"
+    "claude",
+    "design-system",
+    "design-tokens",
+    "screenshot-to-code"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "mimi0132",
+  "license": "MIT",
+  "homepage": "https://github.com/mimi0132/vue-ui-agent#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mimi0132/vue-ui-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mimi0132/vue-ui-agent/issues"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/genai": "^1.0.0",

@@ -201,23 +201,32 @@ npm install -g @skills/cli
 npx @skills/cli add mimi0132/vue-ui-agent
 ```
 
-### 2. 提示 "未检测到 AI 服务配置"
+### 2. 提示 "No valid skills found"
+
+`SKILL.md` 必须带 YAML Frontmatter（`name` + `description`）。本仓库根目录已提供，检查仓库根目录的 `SKILL.md` 文件存在即可。
+
+### 3. 提示 "未检测到 AI 服务配置"
 
 ```bash
 echo $OPENAI_API_KEY   # 确认环境变量已设置
 ```
 
-### 3. 生成的文件为空
+### 4. 截图太大导致报错
 
-建议换用更强的模型：Claude Opus 4.8 / GPT-4o / Gemini 2.5 Flash
+- Gemini / Claude / GPT 都支持图片输入，但单张图建议 ≤ 4MB
+- 大图先用 `sips -Z 2000 screenshot.png` 压缩（macOS）
 
-### 4. 如何更新到最新版本？
+### 5. 生成的文件为空
+
+建议换用更强的模型：Claude Opus 4.5 / GPT-4o / Gemini 2.5 Flash
+
+### 6. 如何更新到最新版本？
 
 ```bash
 npx skills update mimi0132/vue-ui-agent
 ```
 
-### 5. 我的 Agent 不支持图片分析怎么办？
+### 7. 我的 Agent 不支持图片分析怎么办？
 
 将截图保存到本地，然后用命令行模式：
 
@@ -225,8 +234,37 @@ npx skills update mimi0132/vue-ui-agent
 vue-ui-agent ./screenshot.png --framework vue
 ```
 
+### 8. 端口 3456 被占用怎么办？
+
+CLI 会自动寻找下一个可用端口。也可手动指定：修改 `src/preview.js` 的 `getFreePort(startPort = 3456)` 起始端口。
+
+### 9. 想自定义输出目录？
+
+```bash
+vue-ui-agent ./screenshot.png --output ./src/my-ui
+```
+
+或告诉 Agent："输出到 src/components/business/"
+
+### 10. 颜色/组件看起来不对？
+
+- **颜色不准**：颜色识别依赖 AI 视觉模型，换 Gemini 2.5 Flash / Claude Opus 4.5 试试
+- **组件不齐全**：要求明确，例如「至少生成 10 个组件」
+
+---
+
+## 故障排查
+
+| 现象 | 可能原因 | 解决方案 |
+|------|----------|----------|
+| 安装后 Agent 找不到技能 | 技能未安装到该 Agent | 使用 `npx skills add ... -a <agent名> -y` 显式指定 |
+| 生成 `GeneratedComponent_xxx.vue` | AI 没遵守 FILE_START 格式 | 强制要求：「必须用 `<!-- FILE_START: 名称.vue -->` 包裹每个文件」 |
+| 组件 class 冲突 | Tailwind 类名重复 | 改用 CSS Modules 或在组件 style 加 `scoped` |
+| 预览页打开是空白 | colors.css 解析失败 | 删除 colors.css 重试 |
+| `Cannot find module '@google/genai'` | 依赖未装 | `npm install` |
+
 ---
 
 ## License
 
-ISC
+MIT

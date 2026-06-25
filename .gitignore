@@ -2,3 +2,14 @@ node_modules/
 dist/
 .DS_Store
 *.log
+npm-debug.log*
+
+# 临时文件
+.preview/
+*.tmp
+.cache/
+
+# 生成产物（不要提交用户的项目输出）
+src/components/ui/
+src/components/generated/
+src/components/ui-agent/

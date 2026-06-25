@@ -41,7 +41,12 @@ export async function createProvider() {
         },
       });
 
-      return response.text;
+      // 兼容新旧版 SDK
+      const text = typeof response.text === 'function' ? response.text() : response.text;
+      if (!text) {
+        throw new Error('Gemini 返回了空内容，请检查图片格式或稍后重试');
+      }
+      return text;
     },
   };
 }
