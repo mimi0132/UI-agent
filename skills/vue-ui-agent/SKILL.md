@@ -1,3 +1,8 @@
+---
+name: vue-ui-agent
+description: Generate a complete UI component library from screenshots. Use when the user provides a UI screenshot and asks to generate Vue 3 or React components, build a design system, or create reusable UI components.
+---
+
 # Vue UI Agent
 
 从 UI 截图生成一整套高复用的前端组件库。
