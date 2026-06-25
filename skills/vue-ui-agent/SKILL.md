@@ -104,12 +104,31 @@ npx skills add mimi0132/vue-ui-agent --all
 
 ### Step 4：浏览器预览
 
-组件生成后，启动本地预览服务（自动找空闲端口），用浏览器打开预览页面。
+**必须**调用本项目的 `vue-ui-agent` CLI 来启动预览（它会生成带颜色库和组件卡片的预览页，并自动打开浏览器）：
 
-预览页面包含：
-- 所有组件的实时渲染
-- 组件源码查看
-- 响应式布局
+```bash
+# 在用户项目中执行（截图要先保存到本地）
+vue-ui-agent /path/to/screenshot.png
+
+# React 项目
+vue-ui-agent /path/to/screenshot.png -f react
+```
+
+如果 `vue-ui-agent` 命令不存在，Agent 必须先帮用户安装：
+
+```bash
+# 全局安装
+npm install -g /path/to/vue-ui-agent
+
+# 或在用户项目中本地安装
+npm install --save-dev /path/to/vue-ui-agent
+```
+
+**预览页结构**（按顺序展示）：
+1. **颜色库**：所有色卡（gray / primary / success / warning / danger / 文字 / 背景 / 边框）
+2. **组件卡片**：每个组件一张独立大卡片，含所有变体 demo 和「查看源码」折叠区
+
+**绝对禁止**：用 `python3 -m http.server` 或 `npx serve` 启动静态服务 —— 这只能列出文件目录，看不到组件效果。
 
 ## 设计规范
 
