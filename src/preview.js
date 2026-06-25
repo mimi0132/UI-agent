@@ -168,14 +168,87 @@ function generateColorPaletteHTML(colorGroups) {
 }
 
 /**
- * 生成预览 HTML：颜色库 + 每个组件独立一张大卡片 + 所有变体 demo
+ * 解析 typography.css，提取所有 --ui-font-* / --ui-line-height-* / --ui-letter-spacing-* 变量
+ * 优先级：变量值（从用户 CSS 读取）→ fallback（兜底）
  */
-function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS) {
+function parseTypography(typographyCSS) {
+  const defaults = {
+    '--ui-font-size-h1': { value: '32px', label: 'H1 标题', size: '32px', weight: '700', usage: '页面主标题' },
+    '--ui-font-size-h2': { value: '28px', label: 'H2 标题', size: '28px', weight: '600', usage: '区块标题' },
+    '--ui-font-size-h3': { value: '24px', label: 'H3 标题', size: '24px', weight: '600', usage: '卡片标题' },
+    '--ui-font-size-h4': { value: '20px', label: 'H4 标题', size: '20px', weight: '500', usage: '小节标题' },
+    '--ui-font-size-body-lg': { value: '18px', label: '正文大', size: '18px', weight: '400', usage: '引导文字' },
+    '--ui-font-size-body': { value: '16px', label: '正文', size: '16px', weight: '400', usage: '主要正文' },
+    '--ui-font-size-body-sm': { value: '14px', label: '正文小', size: '14px', weight: '400', usage: '辅助说明' },
+    '--ui-font-size-caption': { value: '12px', label: '辅助文字', size: '12px', weight: '400', usage: '标签/注释' },
+  };
+
+  const parsed = [];
+  for (const [name, def] of Object.entries(defaults)) {
+    let value = def.value;
+    if (typographyCSS) {
+      const match = typographyCSS.match(new RegExp(`${name}\\s*:\\s*([^;]+);`));
+      if (match) value = match[1].trim();
+    }
+    parsed.push({ ...def, name, value });
+  }
+
+  return parsed;
+}
+
+/**
+ * 渲染字体规范卡片（在颜色库之后、组件列表之前）
+ */
+function generateTypographyHTML(typographyList) {
+  const rows = typographyList.map(t => `
+    <tr>
+      <td><code>${t.name}</code></td>
+      <td><strong>${t.label}</strong></td>
+      <td><code>${t.value}</code></td>
+      <td><span style="font-size:${t.value};font-weight:${t.weight}">${t.label} 示例</span></td>
+      <td>${t.usage}</td>
+    </tr>
+  `).join('');
+
+  return `
+  <section class="color-palette-card">
+    <header class="palette-header">
+      <h2>字体规范</h2>
+      <p>共 ${typographyList.length} 级字号 · 来源 typography.css</p>
+    </header>
+    <div class="table-wrap">
+      <table class="typography-table">
+        <thead>
+          <tr>
+            <th>变量</th>
+            <th>层级</th>
+            <th>字号</th>
+            <th>预览</th>
+            <th>使用场景</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <details class="palette-source">
+      <summary>查看 typography.css 源码</summary>
+      <pre><code id="typography-source"></code></pre>
+    </details>
+  </section>`;
+}
+
+/**
+ * 生成预览 HTML：颜色库 + 字体规范 + 每个组件独立一张大卡片 + 所有变体 demo
+ */
+function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typographyCSS) {
   const isVue = framework === 'vue';
   const frameworkLabel = isVue ? 'Vue 3' : 'React';
 
   const colorGroups = parseColorPalette(colorsCSS);
   const colorPaletteHTML = generateColorPaletteHTML(colorGroups);
+
+  const typographyList = parseTypography(typographyCSS);
+  const typographyHTML = generateTypographyHTML(typographyList);
 
   const componentCards = componentInfos.map((info) => {
     const { name, source, style, demoHTML, isMissing } = info;
@@ -316,6 +389,61 @@ function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 0.75rem;
+    }
+
+    /* ============== 字体规范卡片 ============== */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--preview-border);
+      border-radius: 0.5rem;
+    }
+    .typography-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .typography-table th,
+    .typography-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--preview-border);
+    }
+    .typography-table th {
+      background: #F9FAFB;
+      font-weight: 600;
+      color: var(--preview-text);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .typography-table tr:last-child td {
+      border-bottom: none;
+    }
+    .typography-table code {
+      background: #F3F4F6;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      color: #4F46E5;
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+    .palette-source {
+      margin-top: 1rem;
+    }
+    .palette-source summary {
+      cursor: pointer;
+      color: var(--preview-text-secondary);
+      font-size: 0.875rem;
+      user-select: none;
+    }
+    .palette-source pre {
+      background: #1F2937;
+      color: #E5E7EB;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
     }
     .color-swatch {
       border-radius: 0.5rem;
@@ -466,6 +594,8 @@ function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS) {
     </div>
   </section>` : ''}
 
+  ${typographyHTML}
+
   <div class="components-list">
     ${componentCards}
   </div>
@@ -497,6 +627,13 @@ export async function createPreview(outputDir, framework, fileNames, rawText) {
     colorsCSS = fs.readFileSync(colorsFilePath, 'utf-8');
   }
 
+  // 读取 typography.css
+  const typographyFilePath = path.join(outputDir, 'typography.css');
+  let typographyCSS = '';
+  if (fs.existsSync(typographyFilePath)) {
+    typographyCSS = fs.readFileSync(typographyFilePath, 'utf-8');
+  }
+
   // 解析 AI 输出，提取 demo
   const { demos } = parseFiles(rawText || '');
 
@@ -519,7 +656,7 @@ export async function createPreview(outputDir, framework, fileNames, rawText) {
       };
     });
 
-  const html = generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS);
+  const html = generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typographyCSS);
   const htmlPath = path.join(previewDir, 'index.html');
   fs.writeFileSync(htmlPath, html, 'utf-8');
 

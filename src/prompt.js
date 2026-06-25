@@ -187,200 +187,159 @@ export default Button;
 
 ### 输出格式要求（极其重要！）
 
-你必须按以下严格格式输出**多个组件**，用特殊分隔符区分每个组件文件。**第一个文件必须是 theme.css**，包含完整的设计 Token：
+**🚨 硬性规定：以下文件必须全部输出，缺一不可，少任何一个视为任务失败 🚨**
+
+按以下**固定顺序**输出文件，**第一个必须是 theme.css**，**最后一个必须是 README.md**：
 
 \`\`\`
 <!-- FILE_START: theme.css -->
-:root {
-  /* 颜色系统 */
-  --ui-color-primary: #从截图提取的主色;
-  --ui-color-primary-hover: #主色hover值;
-  --ui-color-secondary: #次要颜色;
-  --ui-color-success: #成功色;
-  --ui-color-warning: #警告色;
-  --ui-color-danger: #危险色;
-  --ui-color-bg: #背景色;
-  --ui-color-surface: #表面色;
-  --ui-color-border: #边框色;
-  --ui-color-text-primary: #主文字色;
-  --ui-color-text-secondary: #次要文字色;
-  
-  /* 圆角系统 */
-  --ui-radius-sm: 4px;
-  --ui-radius-md: 8px;
-  --ui-radius-lg: 12px;
-  --ui-radius-xl: 16px;
-  --ui-radius-full: 9999px;
-  
-  /* 阴影系统 */
-  --ui-shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --ui-shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-  --ui-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --ui-shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-  
-  /* 间距系统 */
-  --ui-space-xs: 4px;
-  --ui-space-sm: 8px;
-  --ui-space-md: 16px;
-  --ui-space-lg: 24px;
-  --ui-space-xl: 32px;
-  
-  /* 字体系统 */
-  --ui-font-size-xs: 12px;
-  --ui-font-size-sm: 14px;
-  --ui-font-size-md: 16px;
-  --ui-font-size-lg: 18px;
-  --ui-font-size-xl: 24px;
-  
-  /* 过渡动画 */
-  --ui-transition-fast: 150ms ease;
-  --ui-transition-normal: 200ms ease;
-}
+<!-- 包含所有 Design Token：圆角、阴影、间距、动画、过渡、毛玻璃等（**不包含颜色和字体**） -->
 <!-- FILE_END: theme.css -->
 
 <!-- FILE_START: colors.css -->
-/* 完整的颜色库，**从截图提取每一个颜色变体**（不仅是主色），按色系分组 */
-:root {
-  /* === 中性色（从截图提取实际出现的灰色阶梯） === */
-  --ui-color-gray-50: #F9FAFB;
-  --ui-color-gray-100: #F3F4F6;
-  --ui-color-gray-200: #E5E7EB;
-  --ui-color-gray-300: #D1D5DB;
-  --ui-color-gray-400: #9CA3AF;
-  --ui-color-gray-500: #6B7280;
-  --ui-color-gray-600: #4B5563;
-  --ui-color-gray-700: #374151;
-  --ui-color-gray-800: #1F2937;
-  --ui-color-gray-900: #111827;
-
-  /* === 主色（从截图识别的主色，自动生成 50~900 全阶梯） === */
-  --ui-color-primary-50: #EEF2FF;
-  --ui-color-primary-100: #E0E7FF;
-  --ui-color-primary-200: #C7D2FE;
-  --ui-color-primary-300: #A5B4FC;
-  --ui-color-primary-400: #818CF8;
-  --ui-color-primary-500: #主色 base;
-  --ui-color-primary-600: #主色加深 10%;
-  --ui-color-primary-700: #主色加深 20%;
-  --ui-color-primary-800: #主色加深 30%;
-  --ui-color-primary-900: #主色加深 40%;
-
-  /* === 语义色（根据截图实际出现的颜色） === */
-  /* success */
-  --ui-color-success-50: #ECFDF5;
-  --ui-color-success-500: #10B981;
-  --ui-color-success-600: #059669;
-  --ui-color-success-700: #047857;
-  /* warning */
-  --ui-color-warning-50: #FFFBEB;
-  --ui-color-warning-500: #F59E0B;
-  --ui-color-warning-600: #D97706;
-  --ui-color-warning-700: #B45309;
-  /* danger */
-  --ui-color-danger-50: #FEF2F2;
-  --ui-color-danger-500: #EF4444;
-  --ui-color-danger-600: #DC2626;
-  --ui-color-danger-700: #B91C1C;
-  /* info */
-  --ui-color-info-50: #EFF6FF;
-  --ui-color-info-500: #3B82F6;
-  --ui-color-info-600: #2563EB;
-  --ui-color-info-700: #1D4ED8;
-
-  /* === 背景与表面 === */
-  --ui-color-bg-primary: #页面主背景;
-  --ui-color-bg-secondary: #次级背景;
-  --ui-color-surface: #卡片表面色;
-  --ui-color-surface-hover: #悬停态;
-  --ui-color-overlay: rgba(0,0,0,0.5);
-
-  /* === 边框与分割线 === */
-  --ui-color-border: #默认边框;
-  --ui-color-border-light: #浅边框;
-  --ui-color-divider: #分割线;
-
-  /* === 文字色 === */
-  --ui-color-text-primary: #主要文字;
-  --ui-color-text-secondary: #次要文字;
-  --ui-color-text-tertiary: #辅助文字;
-  --ui-color-text-disabled: #禁用文字;
-  --ui-color-text-inverse: #反色文字;
-}
+<!-- 完整颜色库：中性色 50-900 + 主色 50-900 + 语义色 50-700 + 背景/边框/文字色 -->
 <!-- FILE_END: colors.css -->
+
+<!-- FILE_START: typography.css -->
+<!-- 完整字体系统：字体家族 + 8 级字号 (h1-h6/body/caption) + 4 级字重 + 行高 + 字母间距 -->
+<!-- FILE_END: typography.css -->
 
 <!-- FILE_START: Button.vue -->
 <完整的 Button 组件代码>
 <!-- FILE_END: Button.vue -->
 
+<!-- DEMO_START: Button.vue -->
+<ui-button variant="primary">主要按钮</ui-button>
+<ui-button variant="secondary">次要按钮</ui-button>
+<ui-button variant="ghost">幽灵按钮</ui-button>
+<ui-button variant="outline">描边按钮</ui-button>
+<ui-button variant="danger" size="lg">危险按钮</ui-button>
+<ui-button disabled>禁用</ui-button>
+<ui-button loading>加载中</ui-button>
+<ui-button size="sm">小尺寸</ui-button>
+<ui-button size="lg">大尺寸</ui-button>
+<!-- DEMO_END: Button.vue -->
+
 <!-- FILE_START: Input.vue -->
 <完整的 Input 组件代码>
 <!-- FILE_END: Input.vue -->
+
+<!-- DEMO_START: Input.vue -->
+<ui-input placeholder="默认输入框" />
+<ui-input status="error" placeholder="错误状态" />
+<ui-input status="success" placeholder="成功状态" />
+<ui-input disabled placeholder="禁用" />
+<ui-input placeholder="带前缀"><template #prefix>@</template></ui-input>
+<ui-input placeholder="带后缀"><template #suffix>.com</template></ui-input>
+<ui-input size="sm" placeholder="小尺寸" />
+<ui-input size="lg" placeholder="大尺寸" />
+<!-- DEMO_END: Input.vue -->
 
 <!-- FILE_START: Card.vue -->
 <完整的 Card 组件代码>
 <!-- FILE_END: Card.vue -->
 
+<!-- DEMO_START: Card.vue -->
+<ui-card variant="plain">纯文字卡片</ui-card>
+<ui-card variant="elevated">有阴影的卡片</ui-card>
+<ui-card variant="glass">毛玻璃卡片</ui-card>
+<ui-card variant="outlined">描边卡片</ui-card>
+<!-- DEMO_END: Card.vue -->
+
 <!-- FILE_START: Badge.vue -->
-...以此类推...
+<完整的 Badge 组件代码>
 <!-- FILE_END: Badge.vue -->
 
+<!-- DEMO_START: Badge.vue -->
+<ui-badge>默认</ui-badge>
+<ui-badge variant="primary">主色</ui-badge>
+<ui-badge variant="success">成功</ui-badge>
+<ui-badge variant="warning">警告</ui-badge>
+<ui-badge variant="danger">危险</ui-badge>
+<ui-badge variant="info">信息</ui-badge>
+<ui-badge dot>圆点</ui-badge>
+<!-- DEMO_END: Badge.vue -->
+
+<!-- FILE_START: Avatar.vue -->
+<完整的 Avatar 组件代码>
+<!-- FILE_END: Avatar.vue -->
+
+<!-- DEMO_START: Avatar.vue -->
+<ui-avatar src="https://i.pravatar.cc/64" />
+<ui-avatar>U</ui-avatar>
+<ui-avatar size="sm" />
+<ui-avatar size="lg" />
+<ui-avatar shape="square" />
+<!-- DEMO_END: Avatar.vue -->
+
+<!-- FILE_START: Divider.vue -->
+<完整的 Divider 组件代码>
+<!-- FILE_END: Divider.vue -->
+
+<!-- DEMO_START: Divider.vue -->
+<ui-divider />
+<ui-divider>带文字</ui-divider>
+<ui-divider direction="vertical" />
+<!-- DEMO_END: Divider.vue -->
+
+<!-- FILE_START: Tooltip.vue -->
+<完整的 Tooltip 组件代码>
+<!-- FILE_END: Tooltip.vue -->
+
+<!-- DEMO_START: Tooltip.vue -->
+<ui-tooltip content="提示文字" placement="top"><button>上</button></ui-tooltip>
+<ui-tooltip content="提示文字" placement="bottom"><button>下</button></ui-tooltip>
+<ui-tooltip content="提示文字" placement="left"><button>左</button></ui-tooltip>
+<ui-tooltip content="提示文字" placement="right"><button>右</button></ui-tooltip>
+<!-- DEMO_END: Tooltip.vue -->
+
 <!-- FILE_START: README.md -->
-<完整的组件库使用文档，必须包含以下章节：组件清单表格、Props 说明、Slots 说明、交互规则、UI 规范、栅格系统、间距系统、排版系统、颜色使用规范、动画规范、无障碍规范>
+<!-- 完整的组件库使用文档 -->
 <!-- FILE_END: README.md -->
 \`\`\`
 
-**格式规则**：
-1. **第一个文件必须是 theme.css**，包含所有从截图提取的 Design Token（颜色、圆角、阴影、间距、字体）
-2. **第二个文件必须是 colors.css**，包含完整的颜色库（中性色 50-900 + 主色 50-900 + 语义色 50-700 + 背景/边框/文字色）
-3. **最后一个文件必须是 README.md**，包含完整的组件库使用文档
-4. 每个组件用 \`<!-- FILE_START: 文件名 -->\` 和 \`<!-- FILE_END: 文件名 -->\` 包裹
-5. 文件名使用 PascalCase：\`Button.vue\`, \`Input.vue\`, \`Card.vue\` 等（React 用 \`.tsx\` 后缀）
-6. 组件之间不要有其他文字解释
-7. 至少生成 **6 个以上** 组件（Button + Input + Card + Badge + Avatar + Divider 为基础必选）
-8. 根据截图内容**智能延伸**相关组件（看到表单就加 Select/Switch/Checkbox，看到数据列表就加 Table/Pagination）
-9. 组件代码中**必须引用 theme.css / colors.css 中定义的 CSS 变量**，不要硬编码颜色值
+## 🚨 强制性规则（违反任何一条 = 任务失败）🚨
 
-**每个组件文件格式（重要）**：
-每个组件用两个标记包裹：
-1. 第一个标记是组件源码
-2. 第二个标记是该组件的 demo 示例（用于预览页面展示所有变体）
+### 规则 1：必输出文件清单（缺一不可）
+1. ✅ **theme.css**（设计 Token：圆角/阴影/间距/动画/毛玻璃）
+2. ✅ **colors.css**（完整颜色库：中性色 50-900 + 主色 50-900 + 语义色 + 背景/文字/边框色）
+3. ✅ **typography.css**（完整字体系统：字体家族 + 8 级字号 + 4 级字重 + 行高 + 层级映射）
+4. ✅ **README.md**（使用文档：组件清单 + Props + 字体层级表 + 颜色使用 + 栅格 + 间距 + 动画）
+5. ✅ **基础 7 个组件**（Button / Input / Card / Badge / Avatar / Divider / Tooltip）
+6. ✅ **智能延伸组件**（至少 1 个，截图中有表单就加 Select/Switch/Checkbox，有数据列表就加 Table/Pagination，有弹窗就加 Modal）
+7. ✅ **每个组件对应一个 DEMO 块**（覆盖所有 variant/size/state 组合）
 
-例如：
-\`\`\`
-<!-- FILE_START: Button.vue -->
-<Button 组件的完整代码>
-<!-- FILE_END: Button.vue -->
+### 规则 2：组件文件数 ≥ 8 个
+- 7 个基础 + 至少 1 个延伸 = **至少 8 个组件**
+- 组件代码必须是**完整可运行**的，不允许写 \`// ...其他变体\`
 
-<!-- DEMO_START: Button.vue -->
-<!-- 该组件的所有变体用法示例，多个 variant/size/state 都要演示 -->
-<ui-button variant="primary" size="md">主要按钮</ui-button>
-<ui-button variant="secondary" size="md">次要按钮</ui-button>
-<ui-button variant="ghost" size="sm">幽灵按钮</ui-button>
-<ui-button variant="danger" size="lg">危险按钮</ui-button>
-<ui-button disabled>禁用</ui-button>
-<ui-button loading>加载中</ui-button>
-<!-- DEMO_END: Button.vue -->
-\`\`\`
+### 规则 3：DEMO 块 = 强制输出
+- **每个组件都必须有**对应的 \`<!-- DEMO_START: 文件名 -->\` / \`<!-- DEMO_END: 文件名 -->\` 块
+- DEMO 中要演示该组件**所有变体、尺寸、状态**（variant × size × state 全组合）
+- 没有任何一个组件可以没有 DEMO 块
 
-**Demo 编写规则**：
-- 一个组件对应一个 \`&lt;!-- DEMO_START: 文件名 --&gt;\` / \`&lt;!-- DEMO_END: 文件名 --&gt;\` 块
-- Demo 中只写该组件的**所有变体用法**，覆盖所有 props 组合
-- 使用业务无关的占位内容（如 "按钮文字"、"标题"、"卡片内容"）
-- 不写注释，纯净的标签使用示例
+### 规则 4：固定输出顺序
+1. theme.css（**必须第一个**）
+2. colors.css
+3. typography.css
+4. 组件们（按字母顺序）
+5. README.md（**必须最后一个**）
 
-**README.md 必须包含的章节**：
-1. **组件清单**：表格列出所有生成的组件、文件路径、用途描述
-2. **快速开始**：如何在项目中使用（import 示例、注册方式）
-3. **Props 说明**：每个组件的 Props 类型、默认值、必填项
-4. **Slots 说明**：每个组件的具名插槽
-5. **交互规则**：hover/active/focus/disabled 状态的行为
-6. **UI 规范**：圆角/阴影/边框的具体使用场景
-7. **栅格系统**：列数、间距、断点（如 12 栏 / 24px gutter / 响应式断点）
-8. **间距系统**：space 阶梯表（xs/sm/md/lg/xl 的具体使用）
-9. **排版系统**：font-size / line-height / font-weight 阶梯
-10. **颜色规范**：主色/辅助色/语义色的使用场景
-11. **动画规范**：过渡时长、缓动函数
-12. **无障碍规范**：键盘导航、ARIA 属性、对比度
+### 规则 5：禁止 markdown 包裹
+- **绝对禁止**用 \`\`\`vue \`\`\` 或 \`\`\`tsx \`\`\` 包裹组件代码
+- **绝对禁止**用 \`\`\`css \`\`\` 包裹 CSS 代码
+- 所有内容**直接**写在 \`<!-- FILE_START ... -->\` 标记之间
+
+### 规则 6：禁止硬编码
+- 组件中所有颜色/圆角/阴影/字体必须**引用 CSS 变量**（\`var(--ui-color-primary)\`）
+- 禁止在组件代码里写死 \`#FF0000\` / \`8px\` / \`0 4px 6px rgba(...)\`
+
+### 规则 7：引用 CSS 文件
+- 所有组件代码中**必须**在 \`<style>\` 顶部引用：
+  \`\`\`css
+  /* 使用 @import 或直接在入口文件引入 theme.css / colors.css / typography.css */
+  \`\`\`
+
 
 ## 设计原则
 

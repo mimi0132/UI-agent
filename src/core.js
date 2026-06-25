@@ -141,6 +141,68 @@ function generateThemeCSS(componentFiles) {
 }
 
 /**
+ * 生成字体系统 CSS（typography.css）—— AI 未输出时兜底
+ */
+function generateTypographyCSS(componentFiles) {
+  const tokens = new Set();
+
+  componentFiles.forEach(f => {
+    const cssVarMatches = f.content.match(/--ui-font-[\w-]+:\s*[^;]+;/g);
+    if (cssVarMatches) {
+      cssVarMatches.forEach(match => tokens.add(match));
+    }
+  });
+
+  if (tokens.size > 0) {
+    return `:root {\n${Array.from(tokens).join('\n')}\n}\n`;
+  }
+
+  // 默认字体系统（移动端友好 + Material/Tailwind 风）
+  return `:root {
+  /* 字体家族 */
+  --ui-font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ui-font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 字号阶梯 (8 级) */
+  --ui-font-size-h1: 32px;
+  --ui-font-size-h2: 28px;
+  --ui-font-size-h3: 24px;
+  --ui-font-size-h4: 20px;
+  --ui-font-size-body-lg: 18px;
+  --ui-font-size-body: 16px;
+  --ui-font-size-body-sm: 14px;
+  --ui-font-size-caption: 12px;
+
+  /* 字重 */
+  --ui-font-weight-regular: 400;
+  --ui-font-weight-medium: 500;
+  --ui-font-weight-semibold: 600;
+  --ui-font-weight-bold: 700;
+
+  /* 行高 */
+  --ui-line-height-tight: 1.25;
+  --ui-line-height-normal: 1.5;
+  --ui-line-height-relaxed: 1.75;
+
+  /* 字母间距 */
+  --ui-letter-spacing-tight: -0.02em;
+  --ui-letter-spacing-normal: 0;
+  --ui-letter-spacing-wide: 0.05em;
+}
+
+/* 文字层级映射（语义化 class） */
+.ui-text-h1 { font-size: var(--ui-font-size-h1); font-weight: var(--ui-font-weight-bold); line-height: var(--ui-line-height-tight); }
+.ui-text-h2 { font-size: var(--ui-font-size-h2); font-weight: var(--ui-font-weight-semibold); line-height: var(--ui-line-height-tight); }
+.ui-text-h3 { font-size: var(--ui-font-size-h3); font-weight: var(--ui-font-weight-semibold); line-height: var(--ui-line-height-normal); }
+.ui-text-h4 { font-size: var(--ui-font-size-h4); font-weight: var(--ui-font-weight-medium); line-height: var(--ui-line-height-normal); }
+.ui-text-body-lg { font-size: var(--ui-font-size-body-lg); line-height: var(--ui-line-height-normal); }
+.ui-text-body { font-size: var(--ui-font-size-body); line-height: var(--ui-line-height-normal); }
+.ui-text-body-sm { font-size: var(--ui-font-size-body-sm); line-height: var(--ui-line-height-normal); }
+.ui-text-caption { font-size: var(--ui-font-size-caption); line-height: var(--ui-line-height-normal); color: var(--ui-color-text-secondary); }
+`;
+}
+
+/**
  * 生成组件库说明文档（README.md）
  */
 function generateDocsFile(componentFiles, framework) {
@@ -448,18 +510,42 @@ export async function generateComponentLibrary({
     fs.mkdirSync(resolvedOutputDir, { recursive: true });
   }
 
-  const writtenFiles = [];
   const hasThemeCSS = componentFiles.some(f => f.fileName === 'theme.css');
+  const hasColorsCSS = componentFiles.some(f => f.fileName === 'colors.css');
+  const hasTypographyCSS = componentFiles.some(f => f.fileName === 'typography.css');
   const hasREADME = componentFiles.some(f => f.fileName === 'README.md');
 
-  for (const file of componentFiles) {
+  // 固定输出顺序：theme.css → colors.css → typography.css → 组件（按字母） → index.ts → README.md
+  const orderedNames = [
+    'theme.css',
+    'colors.css',
+    'typography.css',
+  ];
+  const componentNames = componentFiles
+    .filter(f => f.fileName.endsWith(fileExt))
+    .map(f => f.fileName)
+    .sort();
+  const otherNames = componentFiles
+    .map(f => f.fileName)
+    .filter(name => !orderedNames.includes(name) && !componentNames.includes(name) && name !== 'README.md');
+
+  const writeOrder = [
+    ...orderedNames.filter(n => componentFiles.some(f => f.fileName === n)),
+    ...componentNames,
+    ...otherNames,
+  ];
+
+  const writtenFiles = [];
+  for (const name of writeOrder) {
+    const file = componentFiles.find(f => f.fileName === name);
+    if (!file) continue;
     const outputPath = path.join(resolvedOutputDir, file.fileName);
     fs.writeFileSync(outputPath, file.content, 'utf-8');
     writtenFiles.push(file.fileName);
   }
 
   const indexContent = generateIndexFile(componentFiles, framework);
-  const indexExt = framework === 'react' ? 'index.ts' : 'index.ts'; // 统一用 .ts（Vue/React 都支持）
+  const indexExt = 'index.ts';
   const indexPath = path.join(resolvedOutputDir, indexExt);
   fs.writeFileSync(indexPath, indexContent, 'utf-8');
   writtenFiles.push(indexExt);
@@ -468,14 +554,29 @@ export async function generateComponentLibrary({
     const themeContent = generateThemeCSS(componentFiles);
     const themePath = path.join(resolvedOutputDir, 'theme.css');
     fs.writeFileSync(themePath, themeContent, 'utf-8');
-    writtenFiles.push('theme.css');
+    if (!writtenFiles.includes('theme.css')) writtenFiles.push('theme.css');
+  }
+
+  if (!hasColorsCSS) {
+    // colors.css 缺省时与 theme.css 共用 token（避免重复，但提供独立文件方便覆盖）
+    const colorsContent = `/* 颜色库独立文件 - 可独立覆盖 theme.css 中的颜色变量 */\n${generateThemeCSS(componentFiles)}`;
+    const colorsPath = path.join(resolvedOutputDir, 'colors.css');
+    fs.writeFileSync(colorsPath, colorsContent, 'utf-8');
+    if (!writtenFiles.includes('colors.css')) writtenFiles.push('colors.css');
+  }
+
+  if (!hasTypographyCSS) {
+    const typographyContent = generateTypographyCSS(componentFiles);
+    const typographyPath = path.join(resolvedOutputDir, 'typography.css');
+    fs.writeFileSync(typographyPath, typographyContent, 'utf-8');
+    if (!writtenFiles.includes('typography.css')) writtenFiles.push('typography.css');
   }
 
   if (!hasREADME) {
     const docsContent = generateDocsFile(componentFiles, framework);
     const docsPath = path.join(resolvedOutputDir, 'README.md');
     fs.writeFileSync(docsPath, docsContent, 'utf-8');
-    writtenFiles.push('README.md');
+    if (!writtenFiles.includes('README.md')) writtenFiles.push('README.md');
   }
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);

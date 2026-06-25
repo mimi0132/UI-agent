@@ -91,44 +91,32 @@ npx skills add mimi0132/vue-ui-agent --all
 
 **禁止**：用 ```vue ``` 等 markdown 代码块包裹。
 
-**输出文件清单**：
-- `theme.css` — Design Token（颜色、圆角、阴影、间距、字体）
-- `Button.vue` / `Button.tsx` — 按钮组件
-- `Input.vue` / `Input.tsx` — 输入框组件
-- `Card.vue` / `Card.tsx` — 卡片组件
-- `Badge.vue` / `Badge.tsx` — 徽章组件
-- `Avatar.vue` / `Avatar.tsx` — 头像组件
-- `Divider.vue` / `Divider.tsx` — 分割线组件
-- `Tooltip.vue` / `Tooltip.tsx` — 提示气泡组件
-- `index.ts` — 组件统一导出（自动生成）
+**输出文件清单**（**全部必输出，缺一不可**）：
+
+| # | 文件 | 必输出 | 内容 |
+|---|------|--------|------|
+| 1 | `theme.css` | ✅ 必出 | Design Token（圆角、阴影、间距、动画、毛玻璃） |
+| 2 | `colors.css` | ✅ 必出 | 完整颜色库（中性色 50-900、主色 50-900、语义色 50-700、背景/边框/文字色） |
+| 3 | `typography.css` | ✅ 必出 | 完整字体系统（字体家族 + 8 级字号 + 4 级字重 + 行高 + 层级映射） |
+| 4 | `Button.vue` | ✅ 必出 | 按钮组件 |
+| 5 | `Input.vue` | ✅ 必出 | 输入框组件 |
+| 6 | `Card.vue` | ✅ 必出 | 卡片组件 |
+| 7 | `Badge.vue` | ✅ 必出 | 徽章组件 |
+| 8 | `Avatar.vue` | ✅ 必出 | 头像组件 |
+| 9 | `Divider.vue` | ✅ 必出 | 分割线组件 |
+| 10 | `Tooltip.vue` | ✅ 必出 | 提示气泡组件 |
+| 11+ | `*.vue` / `*.tsx` | 智能延伸 | 至少 1 个（Select/Switch/Table/Modal/...） |
+| 最后 | `README.md` | ✅ 必出 | 组件库使用文档 |
+| - | `index.ts` | 自动生成 | 组件统一导出 |
 
 ### Step 4：浏览器预览
 
-**必须**调用本项目的 `vue-ui-agent` CLI 来启动预览（它会生成带颜色库和组件卡片的预览页，并自动打开浏览器）：
+组件生成后，启动本地预览服务（自动找空闲端口），用浏览器打开预览页面。
 
-```bash
-# 在用户项目中执行（截图要先保存到本地）
-vue-ui-agent /path/to/screenshot.png
-
-# React 项目
-vue-ui-agent /path/to/screenshot.png -f react
-```
-
-如果 `vue-ui-agent` 命令不存在，Agent 必须先帮用户安装：
-
-```bash
-# 全局安装
-npm install -g /path/to/vue-ui-agent
-
-# 或在用户项目中本地安装
-npm install --save-dev /path/to/vue-ui-agent
-```
-
-**预览页结构**（按顺序展示）：
-1. **颜色库**：所有色卡（gray / primary / success / warning / danger / 文字 / 背景 / 边框）
-2. **组件卡片**：每个组件一张独立大卡片，含所有变体 demo 和「查看源码」折叠区
-
-**绝对禁止**：用 `python3 -m http.server` 或 `npx serve` 启动静态服务 —— 这只能列出文件目录，看不到组件效果。
+预览页面包含：
+- 所有组件的实时渲染
+- 组件源码查看
+- 响应式布局
 
 ## 设计规范
 
