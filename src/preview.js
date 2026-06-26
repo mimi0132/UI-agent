@@ -238,6 +238,138 @@ function generateTypographyHTML(typographyList) {
 }
 
 /**
+ * 解析栅格系统（默认 12 列 + 5 个断点 + 24px gutter）
+ * 优先级：theme.css 中的 CSS 变量 → fallback（兜底）
+ */
+function parseGrid(themeCSS) {
+  const defaults = {
+    columns: 12,
+    gutter: '24px',
+    container: '1280px',
+    breakpoints: [
+      { name: 'sm', min: '640px', device: '手机横屏' },
+      { name: 'md', min: '768px', device: '平板' },
+      { name: 'lg', min: '1024px', device: '笔记本' },
+      { name: 'xl', min: '1280px', device: '桌面' },
+      { name: '2xl', min: '1536px', device: '大屏' },
+    ],
+  };
+
+  let columns = defaults.columns;
+  let gutter = defaults.gutter;
+  let container = defaults.container;
+
+  if (themeCSS) {
+    const colMatch = themeCSS.match(/--ui-grid-columns:\s*(\d+)/);
+    const gutterMatch = themeCSS.match(/--ui-grid-gutter:\s*([^;]+);/);
+    const containerMatch = themeCSS.match(/--ui-grid-container:\s*([^;]+);/);
+    if (colMatch) columns = parseInt(colMatch[1], 10);
+    if (gutterMatch) gutter = gutterMatch[1].trim();
+    if (containerMatch) container = containerMatch[1].trim();
+  }
+
+  return { columns, gutter, container, breakpoints: defaults.breakpoints };
+}
+
+/**
+ * 渲染栅格系统卡片（12 列网格可视化 + 断点列表 + 间距规范）
+ */
+function generateGridHTML(grid) {
+  // 生成 12 列网格可视化
+  const gridCols = Array.from({ length: grid.columns }, (_, i) =>
+    `<div class="grid-col-item">${i + 1}</div>`
+  ).join('');
+
+  // 断点列表
+  const breakpointRows = grid.breakpoints.map(bp => `
+    <tr>
+      <td><strong>${bp.name}</strong></td>
+      <td><code>${bp.min}</code></td>
+      <td>${bp.device}</td>
+    </tr>
+  `).join('');
+
+  // 间距阶梯（基于 gutter 推导）
+  const spaceScale = [
+    { name: 'xs', value: `calc(${grid.gutter} * 0.25)`, usage: '紧凑元素' },
+    { name: 'sm', value: `calc(${grid.gutter} * 0.5)`, usage: '相关元素' },
+    { name: 'md', value: grid.gutter, usage: '标准间距' },
+    { name: 'lg', value: `calc(${grid.gutter} * 1.5)`, usage: '区块间隔' },
+    { name: 'xl', value: `calc(${grid.gutter} * 2)`, usage: '大区块' },
+    { name: '2xl', value: `calc(${grid.gutter} * 3)`, usage: '页面区域' },
+  ];
+  const spaceRows = spaceScale.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td><code>${s.value}</code></td>
+      <td><span class="space-bar" style="width:${s.value}"></span></td>
+      <td>${s.usage}</td>
+    </tr>
+  `).join('');
+
+  return `
+  <section class="color-palette-card">
+    <header class="palette-header">
+      <h2>栅格系统</h2>
+      <p>${grid.columns} 栏 · Container ${grid.container} · Gutter ${grid.gutter} · 来源 theme.css</p>
+    </header>
+
+    <div class="grid-spec">
+      <div class="grid-spec-meta">
+        <div class="grid-meta-item">
+          <span class="grid-meta-label">总列数</span>
+          <span class="grid-meta-value">${grid.columns}</span>
+        </div>
+        <div class="grid-meta-item">
+          <span class="grid-meta-label">列间距 (Gutter)</span>
+          <span class="grid-meta-value">${grid.gutter}</span>
+        </div>
+        <div class="grid-meta-item">
+          <span class="grid-meta-label">容器最大宽度</span>
+          <span class="grid-meta-value">${grid.container}</span>
+        </div>
+        <div class="grid-meta-item">
+          <span class="grid-meta-label">断点数</span>
+          <span class="grid-meta-value">${grid.breakpoints.length}</span>
+        </div>
+      </div>
+
+      <h3 class="grid-section-title">12 栏网格示意</h3>
+      <div class="grid-demo">${gridCols}</div>
+
+      <h3 class="grid-section-title">响应式断点</h3>
+      <div class="table-wrap">
+        <table class="typography-table">
+          <thead>
+            <tr>
+              <th>断点</th>
+              <th>最小宽度</th>
+              <th>适用设备</th>
+            </tr>
+          </thead>
+          <tbody>${breakpointRows}</tbody>
+        </table>
+      </div>
+
+      <h3 class="grid-section-title">间距阶梯 (Space Scale)</h3>
+      <div class="table-wrap">
+        <table class="typography-table">
+          <thead>
+            <tr>
+              <th>层级</th>
+              <th>计算值</th>
+              <th>可视化</th>
+              <th>使用场景</th>
+            </tr>
+          </thead>
+          <tbody>${spaceRows}</tbody>
+        </table>
+      </div>
+    </div>
+  </section>`;
+}
+
+/**
  * 生成预览 HTML：颜色库 + 字体规范 + 每个组件独立一张大卡片 + 所有变体 demo
  */
 function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typographyCSS) {
@@ -249,6 +381,9 @@ function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typ
 
   const typographyList = parseTypography(typographyCSS);
   const typographyHTML = generateTypographyHTML(typographyList);
+
+  const grid = parseGrid(themeCSS);
+  const gridHTML = generateGridHTML(grid);
 
   const componentCards = componentInfos.map((info) => {
     const { name, source, style, demoHTML, isMissing } = info;
@@ -445,6 +580,69 @@ function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typ
       font-size: 0.75rem;
       margin-top: 0.5rem;
     }
+
+    /* ============== 栅格系统卡片 ============== */
+    .grid-spec {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .grid-spec-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+    .grid-meta-item {
+      background: linear-gradient(135deg, #F0F4FF 0%, #FAF5FF 100%);
+      border: 1px solid #E0E7FF;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .grid-meta-label {
+      font-size: 0.75rem;
+      color: var(--preview-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .grid-meta-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4F46E5;
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+    .grid-section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--preview-text);
+      margin: 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--preview-border);
+    }
+    .grid-demo {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0.5rem;
+    }
+    .grid-col-item {
+      background: linear-gradient(135deg, #818CF8 0%, #A78BFA 100%);
+      color: white;
+      text-align: center;
+      padding: 1.25rem 0;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+    .space-bar {
+      display: inline-block;
+      height: 0.75rem;
+      background: linear-gradient(90deg, #6366F1 0%, #A78BFA 100%);
+      border-radius: 0.25rem;
+      vertical-align: middle;
+    }
     .color-swatch {
       border-radius: 0.5rem;
       overflow: hidden;
@@ -595,6 +793,8 @@ function generatePreviewHTML(componentInfos, framework, themeCSS, colorsCSS, typ
   </section>` : ''}
 
   ${typographyHTML}
+
+  ${gridHTML}
 
   <div class="components-list">
     ${componentCards}

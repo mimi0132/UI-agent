@@ -11,6 +11,8 @@ const ArgsSchema = z.object({
   framework: z.enum(['vue', 'react']).default('vue'),
   outputDir: z.string().default('./src/components/ui'),
   preview: z.boolean().default(true),
+  doc: z.boolean().default(false),
+  styleOnly: z.boolean().default(false),
   help: z.boolean().default(false),
 });
 
@@ -25,11 +27,15 @@ Vue UI Agent — 从截图生成整套 UI 组件库
   --framework, -f    目标框架: vue | react   (默认: vue)
   --output, -o       输出目录               (默认: ./src/components/ui)
   --no-preview       生成后不自动打开浏览器预览
+  --doc              额外输出详细设计规范文档 (design-spec.md)
+  --style-only       只输出设计 Token（theme/colors/typography）不生成组件
   --help, -h         显示帮助
 
 示例:
   vue-ui-agent ./screenshot.png
   vue-ui-agent ./design.png -f react -o ./src/ui
+  vue-ui-agent ./screenshot.png --doc
+  vue-ui-agent ./screenshot.png --style-only
 `);
 }
 
@@ -39,6 +45,8 @@ function parseArgs(rawArgs) {
     framework: 'vue',
     outputDir: './src/components/ui',
     preview: true,
+    doc: false,
+    styleOnly: false,
     help: false,
   };
 
@@ -54,6 +62,10 @@ function parseArgs(rawArgs) {
       i++;
     } else if (arg === '--no-preview') {
       args.preview = false;
+    } else if (arg === '--doc') {
+      args.doc = true;
+    } else if (arg === '--style-only') {
+      args.styleOnly = true;
     }
   }
 
@@ -74,7 +86,7 @@ async function main() {
     process.exit(1);
   }
 
-  const { imagePath, framework, outputDir, preview } = parsed.data;
+  const { imagePath, framework, outputDir, preview, doc, styleOnly } = parsed.data;
 
   const ext = path.extname(imagePath).toLowerCase();
   const mimeType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
@@ -86,6 +98,8 @@ async function main() {
       imageMimeType: mimeType,
       framework,
       outputDir,
+      doc,
+      styleOnly,
       onProgress: (msg) => console.log(msg),
     });
 

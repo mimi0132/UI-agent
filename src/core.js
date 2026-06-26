@@ -475,6 +475,8 @@ export async function generateComponentLibrary({
   imageMimeType = 'image/png',
   framework,
   outputDir = './src/components/ui',
+  doc = false,
+  styleOnly = false,
   onProgress,
 }) {
   const startTime = Date.now();
@@ -485,7 +487,7 @@ export async function generateComponentLibrary({
   const { name: providerName, displayName, client: aiProvider } = await detectProvider();
 
   const { getSystemPrompt } = await import('./prompt.js');
-  const systemPrompt = getSystemPrompt(framework);
+  const systemPrompt = getSystemPrompt(framework, { styleOnly, doc });
 
   if (onProgress) onProgress(`🤖 使用模型: ${displayName}，正在分析截图...`);
 

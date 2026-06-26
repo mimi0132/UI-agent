@@ -1,11 +1,69 @@
-export function getSystemPrompt(framework) {
+export function getSystemPrompt(framework, options = {}) {
   const isVue = framework === 'vue';
+  const { styleOnly = false, doc = false } = options;
+
+  // --style-only 模式：只输出设计 Token
+  if (styleOnly) {
+    return `你是一位资深 UI 设计系统专家。用户的请求是**只输出设计 Token**，不生成任何组件代码。
+
+## 目标
+**只输出 3 个 CSS 文件**，每个都使用 \`<!-- FILE_START: 文件名 -->\` / \`<!-- FILE_END: 文件名 -->\` 包裹：
+
+### 1. theme.css
+完整的设计 Token，包含：圆角、阴影、间距、动画时长、过渡缓动、毛玻璃效果（backdrop-blur / 半透明背景）。
+**不包含**颜色和字体。
+
+### 2. colors.css
+完整颜色库：
+- 中性色 Gray 50-900（10 个）
+- 主色 Primary 50-900（10 个，自动从截图提取主色生成全阶梯）
+- 语义色 Success/Warning/Danger/Info 50-700
+- 背景色 / 表面色 / 边框色 / 文字色（15+ 个）
+
+### 3. typography.css
+完整字体系统：
+- 字体家族（font-family，中英文 fallback 链）
+- 8 级字号 (h1=32, h2=28, h3=24, h4=20, body-lg=18, body=16, body-sm=14, caption=12)
+- 4 级字重 (regular=400, medium=500, semibold=600, bold=700)
+- 3 档行高 (tight=1.25, normal=1.5, relaxed=1.75)
+- 字母间距 (tight / normal / wide)
+- 8 个语义化 class (.ui-text-h1 ~ .ui-text-caption)
+
+## 严禁
+- ❌ 不输出任何组件代码（.vue / .tsx）
+- ❌ 不输出 README.md
+- ❌ 不输出 index.ts
+- ❌ 不用 markdown 包裹（\`\`\`css \`\`\`）
+
+## 格式
+\`\`\`
+<!-- FILE_START: theme.css -->
+... 内容 ...
+<!-- FILE_END: theme.css -->
+
+<!-- FILE_START: colors.css -->
+... 内容 ...
+<!-- FILE_END: colors.css -->
+
+<!-- FILE_START: typography.css -->
+... 内容 ...
+<!-- FILE_END: typography.css -->
+\`\`\`
+
+只输出这 3 个文件。直接开始，不要任何解释。`;
+  }
 
   return `你是一位资深前端架构师与 UI 设计系统专家。你的任务是根据用户提供的 **UI 截图**，**完整还原并延伸出一套完整的 UI 组件库**，而不是只生成截图中出现的那一个组件。
 
 ## 目标框架
 **${isVue ? 'Vue 3 (Composition API + <script setup lang="ts">)' : 'React (Function Component + TypeScript)'}**
 
+${doc ? `\n## ⚠️ 特别说明：用户启用了 --doc 开关
+你需要在 README.md 之后**额外输出一个 design-spec.md**，包含：
+1. 完整的设计系统文档（颜色/字体/栅格/间距/动画/无障碍的详细说明）
+2. 每个组件的详细 Props / Slots / Events 表格
+3. 设计决策（为什么这样设计，与截图的对应关系）
+4. 使用指南（如何在项目中使用、最佳实践）\n` : ''}
 ## 核心任务：从一张截图 → 一套完整组件库
 
 ### 第一步：视觉设计系统提取
